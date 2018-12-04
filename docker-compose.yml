@@ -1,0 +1,38 @@
+version: '3.6'
+services:
+  mongo:
+    container_name: sitemap_mongo
+    image: mongo:4
+    restart: always
+    volumes:
+    - mongodb_vol:/data/db
+    networks:
+    - sitemap_services-tier
+    ports:
+    - 127.0.0.1:27017:27017
+
+  node:
+    container_name: sitemap_node
+    restart: always
+    volumes:
+      - /var/initial-data:/data
+      - /var/sitemap:/sitemap
+    depends_on:
+    - mongo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+    - sitemap_services-tier
+    environment:
+    - GLS_DAY_START
+    - GLS_METRICS_HOST
+    - GLS_METRICS_PORT
+    - GLS_MONGO_CONNECT
+    - GLS_FETCH_INTERVAL
+
+volumes:
+  mongodb_vol:
+
+networks:
+  sitemap_services-tier:

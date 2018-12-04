@@ -1,0 +1,39 @@
+{
+  "name": "golos-site-map",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "author": "Golos.io team",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "download": "node scripts/download_initial_site_map.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "gls-core-service": "^2.13.2",
+    "golos-js": "^0.7.5",
+    "mongodb": "^3.1.10",
+    "mongoose": "^5.3.14",
+    "tunnel-ssh": "^4.1.4",
+    "xmlbuilder": "^10.1.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4,
+    "semi": true,
+    "trailingComma": "all",
+    "printWidth": 80,
+    "overrides": [
+      {
+        "files": [
+          "*.json"
+        ],
+        "options": {
+          "tabWidth": 2
+        }
+      }
+    ]
+  }
+}
