@@ -6,7 +6,7 @@ const Post = require('../models/Post');
 
 const Block = core.utils.Block;
 
-const LAST_BLOCK_DEFAULT = 22303100;
+const LAST_BLOCK_DEFAULT = 22332560;
 
 class StateManager {
     constructor() {
