@@ -16,11 +16,11 @@ class SiteMapGenerator {
     async initialSync() {
         Logger.log('Initial sync started');
 
-        const current = new Date(FIRST_POST_DATE);
+        const current = moment(FIRST_POST_DATE);
         const today = moment().format('YYYY-MM-DD');
 
         while (true) {
-            const date = moment(current).format('YYYY-MM-DD');
+            const date = current.format('YYYY-MM-DD');
 
             await this._syncDate(date);
 
@@ -28,7 +28,7 @@ class SiteMapGenerator {
                 break;
             }
 
-            current.setDate(current.getDate() + 1);
+            current.add(1, 'day');
         }
 
         await this._syncIndex();
@@ -37,14 +37,7 @@ class SiteMapGenerator {
     }
 
     async sync() {
-        const query = Post.find(
-            {
-                synced: false,
-            },
-            { date: 1 },
-        );
-
-        const posts = await query.exec();
+        const posts = await Post.find({ synced: false }, { date: 1 });
 
         const dates = new Set();
 
@@ -60,28 +53,13 @@ class SiteMapGenerator {
     }
 
     async _syncDate(date) {
-        const posts = await Post.find({ date })
-            .sort({ created: 1 })
-            .exec();
+        const posts = await Post.find({ date }).sort({ created: 1 });
 
         if (!posts.length) {
             return;
         }
 
-        const WEEK_AGO = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        const MONTH_AGO = Date.now() - 30 * 24 * 60 * 60 * 1000;
-
-        const time = new Date(date).getTime();
-
-        let changeFreq;
-
-        if (time > WEEK_AGO) {
-            changeFreq = 'daily';
-        } else if (time > MONTH_AGO) {
-            changeFreq = 'weekly';
-        } else {
-            changeFreq = 'monthly';
-        }
+        const changeFreq = this._getChangeFreq(date);
 
         const xmlUrlList = [];
         let lastMod = null;
@@ -116,14 +94,11 @@ class SiteMapGenerator {
 
         await this._writeXml(`/sitemap/sitemap_${date}.xml`, doc);
 
-        await Post.updateMany(
-            {
-                date,
-            },
-            {
-                synced: true,
-            },
-        );
+        await this._updateDayInfo(date, lastMod);
+    }
+
+    async _updateDayInfo(date, lastMod) {
+        await Post.updateMany({ date }, { synced: true });
 
         await DayInfo.updateOne(
             {
@@ -140,9 +115,7 @@ class SiteMapGenerator {
     }
 
     async _syncIndex() {
-        const daysInfo = await DayInfo.find({})
-            .sort({ date: 1 })
-            .exec();
+        const daysInfo = await DayInfo.find({}).sort({ date: 1 });
 
         const xmlSiteMapList = [];
 
@@ -169,6 +142,22 @@ class SiteMapGenerator {
     async _writeXml(fileName, doc) {
         await fs.writeFile(fileName + '_', doc.end({ pretty: true }));
         await fs.rename(fileName + '_', fileName);
+    }
+
+    _getChangeFreq(date) {
+        const monthAgo = moment().subtract(30, 'day');
+        const weekAgo = moment().subtract(7, 'day');
+        const ts = moment(date);
+
+        if (ts.isAfter(weekAgo, 'day')) {
+            return 'daily';
+        }
+
+        if (ts.isAfter(monthAgo, 'day')) {
+            return 'weekly';
+        }
+
+        return 'monthly';
     }
 }
 

@@ -62,8 +62,14 @@ class Main extends BasicMain {
 
     async _doIteration() {
         const lastBlockNum = this._state.getLastAppliedBlockNum();
+        let globalProps;
 
-        const globalProps = await golos.api.getDynamicGlobalProperties();
+        try {
+            globalProps = await golos.api.getDynamicGlobalProperties();
+        } catch (err) {
+            // Ничего не далаем, просто пропускаем итерацию
+            return;
+        }
 
         const lastIrrBlockNum = globalProps.last_irreversible_block_num;
 

@@ -1,7 +1,10 @@
 const moment = require('moment');
+const core = require('gls-core-service');
 
 const State = require('../models/State');
 const Post = require('../models/Post');
+
+const Block = core.utils.Block;
 
 const LAST_BLOCK_DEFAULT = 22303100;
 
@@ -31,36 +34,34 @@ class StateManager {
 
     async applyBlock(block) {
         const ts = block.timestamp;
-        const timestamp = new Date(ts.endsWith('Z') ? ts : ts + 'Z');
+        // Fix invalid date format from blockchain
+        const timestamp = moment(ts.endsWith('Z') ? ts : ts + 'Z');
 
-        for (let tx of block.transactions) {
-            for (let [action, data] of tx.operations) {
-                if (action === 'comment' && !data.parent_author) {
-                    await this._processPost(data, timestamp);
-                }
+        for (let [action, data] of Block.eachRealOperation(block)) {
+            if (action === 'comment' && !data.parent_author) {
+                await this._processPost(data, timestamp);
             }
         }
     }
 
     async _processPost({ parent_permlink, author, permlink }, timestamp) {
         const link = `/${parent_permlink}/@${author}/${permlink}`;
-        const dateTimestamp = new Date(timestamp);
 
         const post = await Post.findOne({ link });
 
         if (post) {
-            post.lastMod = dateTimestamp;
+            post.lastMod = timestamp;
             post.synced = false;
 
             await post.save();
         } else {
-            const date = moment(timestamp).format('YYYY-MM-DD');
+            const date = timestamp.format('YYYY-MM-DD');
 
             const post = new Post({
                 link,
                 date,
-                created: dateTimestamp,
-                lastMod: dateTimestamp,
+                created: timestamp,
+                lastMod: timestamp,
                 synced: false,
             });
 
