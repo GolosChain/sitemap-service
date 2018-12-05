@@ -15,6 +15,7 @@ class Main extends Basic {
 
         const mongo = new MongoDB();
         const dumpLoader = new DumpLoader();
+
         this._state = new StateManager();
 
         this.printEnvBasedConfig(env);
@@ -27,9 +28,9 @@ class Main extends Basic {
 
         await this._state.load();
 
-        const alreadySome = await DayInfo.findOne();
+        const count = await DayInfo.countDocuments();
 
-        await this._syncSiteMaps(!alreadySome);
+        await this._syncSiteMaps(count === 0);
 
         this.startLoop(1000, env.GLS_FETCH_INTERVAL);
     }
@@ -57,7 +58,10 @@ class Main extends Basic {
                 await this._state.applyBlock(block);
                 somethingApplied = true;
             }
-        } catch (err) {}
+        } catch (err) {
+            // Ничего не делаем, через 3 секунды будет новая попытка.
+            Logger.error('Iteration error:', err);
+        }
 
         if (somethingApplied) {
             this._state.setLastBlockNum(lastIrrBlockNum);
@@ -69,7 +73,6 @@ class Main extends Basic {
         const siteMapGenerator = new SiteMapGenerator();
 
         if (isInitial) {
-            console.log('Initial sync started');
             await siteMapGenerator.initialSync();
         } else {
             await siteMapGenerator.sync();

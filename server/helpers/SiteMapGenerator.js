@@ -1,8 +1,12 @@
 const fs = require('fs-extra');
+const core = require('gls-core-service');
 const xmlbuilder = require('xmlbuilder');
+const moment = require('moment');
 
 const Post = require('../models/Post');
 const DayInfo = require('../models/DayInfo');
+
+const Logger = core.utils.Logger;
 
 const HOSTNAME = 'https://golos.io/';
 
@@ -10,11 +14,13 @@ const FIRST_POST_DATE = '2016-10-18';
 
 class SiteMapGenerator {
     async initialSync() {
+        Logger.log('Initial sync started');
+
         const current = new Date(FIRST_POST_DATE);
-        const today = new Date().toJSON().substr(0, 10);
+        const today = moment().format('YYYY-MM-DD');
 
         while (true) {
-            const date = current.toJSON().substr(0, 10);
+            const date = moment(current).format('YYYY-MM-DD');
 
             await this._syncDate(date);
 
@@ -26,6 +32,8 @@ class SiteMapGenerator {
         }
 
         await this._syncIndex();
+
+        Logger.log('Initial sync complete');
     }
 
     async sync() {
@@ -52,7 +60,9 @@ class SiteMapGenerator {
     }
 
     async _syncDate(date) {
-        const posts = await Post.find({ date }).exec();
+        const posts = await Post.find({ date })
+            .sort({ created: 1 })
+            .exec();
 
         if (!posts.length) {
             return;

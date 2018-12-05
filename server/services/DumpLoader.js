@@ -9,13 +9,12 @@ const initialDataFilename = '/data/initial-data.json';
 
 class DumpLoader extends Basic {
     async start() {
-        const somePost = await Post.findOne({});
+        const count = await Post.countDocuments();
 
-        if (!somePost) {
+        if (count === 0) {
             Logger.log('Start initial data loading');
 
             const initialDataJSON = await fs.readFile(initialDataFilename);
-
             const initialData = JSON.parse(initialDataJSON);
 
             for (let date in initialData) {

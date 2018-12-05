@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const State = require('../models/State');
 const Post = require('../models/Post');
 
@@ -52,7 +54,7 @@ class StateManager {
 
             await post.save();
         } else {
-            const date = timestamp.toJSON().substr(0, 10);
+            const date = moment(timestamp).format('YYYY-MM-DD');
 
             const post = new Post({
                 link,

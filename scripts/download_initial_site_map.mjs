@@ -1,6 +1,7 @@
 const fs = require('fs');
 const tunnel = require('tunnel-ssh');
 const mongodb = require('mongodb');
+const moment = require('moment');
 
 const config = {
     username: process.env.SSH_USERNAME,
@@ -64,7 +65,7 @@ tunnel(config, async function(error, server) {
             break;
         }
 
-        const date = new Date(doc.created).toJSON().substr(0, 10);
+        const date = moment(doc.created).format('YYYY-MM-DD');
 
         let list = dates[date];
 
