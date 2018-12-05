@@ -7,25 +7,24 @@ const SiteMapGenerator = require('./helpers/SiteMapGenerator');
 const DumpLoader = require('./services/DumpLoader');
 const DayInfo = require('./models/DayInfo');
 
-const { Basic, MongoDB } = core.services;
+const { BasicMain, MongoDB } = core.services;
 const Logger = core.utils.Logger;
+const stats = core.utils.statsClient;
 
-class Main extends Basic {
+class Main extends BasicMain {
     constructor() {
-        super();
+        super(stats, env);
 
         const mongo = new MongoDB();
         const dumpLoader = new DumpLoader();
 
         this._state = new StateManager();
 
-        this.printEnvBasedConfig(env);
         this.addNested(mongo, dumpLoader);
-        this.stopOnExit();
     }
 
     async start() {
-        await this.startNested();
+        await super.start();
 
         await this._state.load();
 
@@ -36,11 +35,18 @@ class Main extends Basic {
         setImmediate(() => this._startIterating());
     }
 
+    async stop() {
+        this._stop = true;
+        await this._currentIteration;
+
+        await super.stop();
+    }
+
     async _startIterating() {
         while (!this._stop) {
             const start = Date.now();
 
-            this._currentIteration = this.doIteration();
+            this._currentIteration = this._doIteration();
 
             await this._currentIteration;
 
@@ -54,14 +60,7 @@ class Main extends Basic {
         }
     }
 
-    async stop() {
-        this._stop = true;
-        await this._currentIteration;
-
-        await super.stop();
-    }
-
-    async doIteration() {
+    async _doIteration() {
         const lastBlockNum = this._state.getLastAppliedBlockNum();
 
         const globalProps = await golos.api.getDynamicGlobalProperties();
