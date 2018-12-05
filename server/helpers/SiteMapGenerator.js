@@ -173,7 +173,7 @@ class SiteMapGenerator {
 }
 
 function formatDate(date) {
-    return date.toJSON().replace('Z', '+00:00');
+    return date.toJSON().substr(0, 19) + '+00:00';
 }
 
 module.exports = SiteMapGenerator;

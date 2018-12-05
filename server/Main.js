@@ -1,6 +1,7 @@
 const golos = require('golos-js');
 const core = require('gls-core-service');
 const env = require('./env');
+const { sleep } = require('./helpers/time');
 const StateManager = require('./helpers/StateManager');
 const SiteMapGenerator = require('./helpers/SiteMapGenerator');
 const DumpLoader = require('./services/DumpLoader');
@@ -32,10 +33,35 @@ class Main extends Basic {
 
         await this._syncSiteMaps(count === 0);
 
-        this.startLoop(1000, env.GLS_FETCH_INTERVAL);
+        setImmediate(() => this._startIterating());
     }
 
-    async iteration() {
+    async _startIterating() {
+        while (!this._stop) {
+            const start = Date.now();
+
+            this._currentIteration = this.doIteration();
+
+            await this._currentIteration;
+
+            if (this._stop) {
+                break;
+            }
+
+            await sleep(
+                Math.max(0, env.GLS_FETCH_INTERVAL - (Date.now() - start)),
+            );
+        }
+    }
+
+    async stop() {
+        this._stop = true;
+        await this._currentIteration;
+
+        await super.stop();
+    }
+
+    async doIteration() {
         const lastBlockNum = this._state.getLastAppliedBlockNum();
 
         const globalProps = await golos.api.getDynamicGlobalProperties();
