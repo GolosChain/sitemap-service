@@ -90,7 +90,7 @@ class Main extends Basic {
         }
 
         if (somethingApplied) {
-            this._state.setLastBlockNum(lastIrrBlockNum);
+            await this._state.setLastBlockNum(lastIrrBlockNum);
             await this._syncSiteMaps();
         }
     }

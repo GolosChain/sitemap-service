@@ -24,9 +24,9 @@ class StateManager {
         return this._state.lastAppliedBlockNum || LAST_BLOCK_DEFAULT;
     }
 
-    setLastBlockNum(blockNum) {
+    async setLastBlockNum(blockNum) {
         this._state.lastAppliedBlockNum = blockNum;
-        this._state.save();
+        await this._state.save();
     }
 
     async applyBlock(block) {
