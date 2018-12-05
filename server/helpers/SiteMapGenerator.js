@@ -8,7 +8,7 @@ const DayInfo = require('../models/DayInfo');
 
 const Logger = core.utils.Logger;
 
-const HOSTNAME = 'https://golos.io/';
+const HOSTNAME = 'https://golos.io';
 
 const FIRST_POST_DATE = '2016-10-18';
 
@@ -121,7 +121,7 @@ class SiteMapGenerator {
 
         for (let dayInfo of daysInfo) {
             xmlSiteMapList.push({
-                loc: `${HOSTNAME}sitemap_${dayInfo.date}.xml`,
+                loc: `${HOSTNAME}/sitemap_${dayInfo.date}.xml`,
                 lastmod: formatDate(dayInfo.lastMod),
             });
         }
