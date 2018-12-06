@@ -46,11 +46,11 @@ class SiteMapGenerator {
 
         const dates = new Set();
 
-        for (let post of posts) {
+        for (const post of posts) {
             dates.add(post.date);
         }
 
-        for (let date of dates) {
+        for (const date of dates) {
             await this._syncDate(date);
         }
 
@@ -79,7 +79,7 @@ class SiteMapGenerator {
 
         let lastMod = null;
 
-        for (let post of posts) {
+        for (const post of posts) {
             if (!lastMod || lastMod < post.lastMod) {
                 lastMod = post.lastMod;
             }
@@ -136,7 +136,7 @@ class SiteMapGenerator {
 
         const tags = await this._getTrendingTags();
 
-        for (let { name } of tags) {
+        for (const { name } of tags) {
             links.push(
                 {
                     loc: `${HOSTNAME}/trending/${name}`,
@@ -149,7 +149,7 @@ class SiteMapGenerator {
             );
         }
 
-        for (let link of links) {
+        for (const link of links) {
             link.lastmod = lastMod;
         }
 
@@ -173,7 +173,7 @@ class SiteMapGenerator {
             },
         ];
 
-        for (let dayInfo of daysInfo) {
+        for (const dayInfo of daysInfo) {
             xmlSiteMapList.push({
                 loc: `${HOSTNAME}/sitemap_${dayInfo.date}.xml`,
                 lastmod: formatDate(dayInfo.lastMod),

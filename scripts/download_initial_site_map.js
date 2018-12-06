@@ -81,7 +81,7 @@ tunnel(config, async function(error, server) {
         });
     }
 
-    for (let date in dates) {
+    for (const date in dates) {
         if (dates.hasOwnProperty(date)) {
             dates[date].sort((a, b) => a.created - b.created);
         }

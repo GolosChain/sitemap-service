@@ -80,11 +80,17 @@ class Main extends BasicMain {
         let somethingApplied = false;
 
         try {
+            let iterationsCount = 0;
+
             for (
-                let blockNum = lastBlockNum + 1, iterationsCount = 0;
-                blockNum <= lastIrrBlockNum && iterationsCount < 1000;
-                blockNum++, iterationsCount++
+                let blockNum = lastBlockNum + 1;
+                blockNum <= lastIrrBlockNum;
+                blockNum++
             ) {
+                if (++iterationsCount === 1000) {
+                    break;
+                }
+
                 const block = await golos.api.getBlock(blockNum);
                 await this._state.applyBlock(block);
                 somethingApplied = true;

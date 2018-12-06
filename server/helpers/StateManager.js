@@ -37,7 +37,7 @@ class StateManager {
         // Fix invalid date format from blockchain
         const timestamp = moment(ts.endsWith('Z') ? ts : ts + 'Z');
 
-        for (let [action, data] of Block.eachRealOperation(block)) {
+        for (const [action, data] of Block.eachRealOperation(block)) {
             if (action === 'comment' && !data.parent_author) {
                 await this._processPost(data, timestamp);
             }
