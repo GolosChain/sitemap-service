@@ -17,10 +17,10 @@ class DumpLoader extends Basic {
             const initialDataJSON = await fs.readFile(initialDataFilename);
             const initialData = JSON.parse(initialDataJSON);
 
-            for (let date in initialData) {
+            for (const date in initialData) {
                 const posts = initialData[date];
 
-                for (let post of posts) {
+                for (const post of posts) {
                     const postModel = new Post({
                         link: post.link,
                         date,

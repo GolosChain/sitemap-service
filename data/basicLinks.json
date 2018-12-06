@@ -1,0 +1,34 @@
+[
+  {
+    "loc": "https://golos.io/created",
+    "changefreq": "always"
+  },
+  {
+    "loc": "https://golos.io/hot",
+    "changefreq": "daily"
+  },
+  {
+    "loc": "https://golos.io/trending",
+    "changefreq": "daily"
+  },
+  {
+    "loc": "https://golos.io/promoted",
+    "changefreq": "daily"
+  },
+  {
+    "loc": "https://golos.io/~witnesses",
+    "changefreq": "daily"
+  },
+  {
+    "loc": "https://golos.io/tags/hot",
+    "changefreq": "daily"
+  },
+  {
+    "loc": "https://golos.io/about",
+    "changefreq": "monthly"
+  },
+  {
+    "loc": "https://golos.io/static/search.html",
+    "changefreq": "never"
+  }
+]
