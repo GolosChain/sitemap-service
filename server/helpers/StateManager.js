@@ -1,6 +1,7 @@
 const moment = require('moment');
 const core = require('gls-core-service');
 
+const { IGNORE_TAGS } = require('../constants');
 const State = require('../models/State');
 const Post = require('../models/Post');
 
@@ -38,7 +39,12 @@ class StateManager {
         const timestamp = moment(ts.endsWith('Z') ? ts : ts + 'Z');
 
         for (const [action, data] of Block.eachRealOperation(block)) {
-            if (action === 'comment' && !data.parent_author) {
+            if (
+                action === 'comment' &&
+                !data.parent_author &&
+                !IGNORE_TAGS.has(data.category)
+            ) {
+                console.log(data);
                 await this._processPost(data, timestamp);
             }
         }
