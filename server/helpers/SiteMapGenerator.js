@@ -2,15 +2,20 @@ const fs = require('fs-extra');
 const core = require('gls-core-service');
 const xmlbuilder = require('xmlbuilder');
 const moment = require('moment');
+const golos = require('golos-js');
+const cloneDeep = require('lodash/cloneDeep');
 
+const { sleep } = require('../helpers/time');
 const Post = require('../models/Post');
 const DayInfo = require('../models/DayInfo');
+const basicLinks = require('../../data/basicLinks.json');
 
 const Logger = core.utils.Logger;
 
 const HOSTNAME = 'https://golos.io';
 
 const FIRST_POST_DATE = '2016-10-18';
+const REFRESH_TAGS_INTERVAL = 5 * 60 * 1000;
 
 class SiteMapGenerator {
     async initialSync() {
@@ -61,26 +66,40 @@ class SiteMapGenerator {
 
         const changeFreq = this._getChangeFreq(date);
 
-        const xmlUrlList = [];
+        const urls = posts.map(post => ({
+            loc: HOSTNAME + post.link,
+            lastmod: formatDate(post.lastMod),
+            changefreq: changeFreq,
+        }));
+
+        await this._generateAndWriteUrlList(
+            `/sitemap/sitemap_${date}.xml`,
+            urls,
+        );
+
         let lastMod = null;
 
         for (let post of posts) {
-            xmlUrlList.push({
-                loc: {
-                    '#text': HOSTNAME + post.link,
-                },
-                lastmod: {
-                    '#text': formatDate(post.lastMod),
-                },
-                changefreq: {
-                    '#text': changeFreq,
-                },
-            });
-
             if (!lastMod || lastMod < post.lastMod) {
                 lastMod = post.lastMod;
             }
         }
+
+        await this._updateDayInfo(date, lastMod);
+    }
+
+    async _generateAndWriteUrlList(fileName, urls) {
+        const xmlUrlList = urls.map(urlInfo => ({
+            loc: {
+                '#text': urlInfo.loc,
+            },
+            lastmod: {
+                '#text': urlInfo.lastmod,
+            },
+            changefreq: {
+                '#text': urlInfo.changefreq,
+            },
+        }));
 
         const doc = xmlbuilder.create(
             {
@@ -92,9 +111,7 @@ class SiteMapGenerator {
             { encoding: 'utf-8' },
         );
 
-        await this._writeXml(`/sitemap/sitemap_${date}.xml`, doc);
-
-        await this._updateDayInfo(date, lastMod);
+        await this._writeXml(fileName, doc);
     }
 
     async _updateDayInfo(date, lastMod) {
@@ -114,10 +131,47 @@ class SiteMapGenerator {
         );
     }
 
+    async _regenerateCommonSitemap(lastMod) {
+        const links = cloneDeep(basicLinks);
+
+        const tags = await this._getTrendingTags();
+
+        for (let { name } of tags) {
+            links.push(
+                {
+                    loc: `${HOSTNAME}/trending/${name}`,
+                    changefreq: 'daily',
+                },
+                {
+                    loc: `${HOSTNAME}/hot/${name}`,
+                    changefreq: 'daily',
+                },
+            );
+        }
+
+        for (let link of links) {
+            link.lastmod = lastMod;
+        }
+
+        await this._generateAndWriteUrlList(
+            '/sitemap/sitemap_common.xml',
+            links,
+        );
+    }
+
     async _syncIndex() {
+        const lastMod = formatDate(new Date());
+
+        await this._regenerateCommonSitemap(lastMod);
+
         const daysInfo = await DayInfo.find({}).sort({ date: 1 });
 
-        const xmlSiteMapList = [];
+        const xmlSiteMapList = [
+            {
+                loc: `${HOSTNAME}/sitemap_common.xml`,
+                lastmod: lastMod,
+            },
+        ];
 
         for (let dayInfo of daysInfo) {
             xmlSiteMapList.push({
@@ -136,7 +190,7 @@ class SiteMapGenerator {
             { encoding: 'utf-8' },
         );
 
-        await this._writeXml('/sitemap/sitemap_index.xml', doc);
+        await this._writeXml('/sitemap/sitemap.xml', doc);
     }
 
     async _writeXml(fileName, doc) {
@@ -158,6 +212,21 @@ class SiteMapGenerator {
         }
 
         return 'monthly';
+    }
+
+    async _getTrendingTags() {
+        if (!this._tags || Date.now() > this._tagsTs + REFRESH_TAGS_INTERVAL) {
+            try {
+                this._tags = await golos.api.getTrendingTags(null, 100);
+                this._tagsTs = Date.now();
+            } catch (err) {
+                Logger.error('Get tags error:', err);
+                await sleep(5000);
+                return await this._getTrendingTags();
+            }
+        }
+
+        return this._tags;
     }
 }
 
