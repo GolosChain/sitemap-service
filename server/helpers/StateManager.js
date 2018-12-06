@@ -42,9 +42,9 @@ class StateManager {
             if (
                 action === 'comment' &&
                 !data.parent_author &&
-                !IGNORE_TAGS.has(data.category)
+                !IGNORE_TAGS.has(data.parent_permlink) &&
+                data.parent_permlink !== 'goldvoice'
             ) {
-                console.log(data);
                 await this._processPost(data, timestamp);
             }
         }

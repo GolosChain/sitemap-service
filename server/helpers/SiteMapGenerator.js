@@ -9,7 +9,7 @@ const { sleep } = require('../helpers/time');
 const Post = require('../models/Post');
 const DayInfo = require('../models/DayInfo');
 const basicLinks = require('../../data/basicLinks.json');
-const IGNORE_TAGS = require('../constants');
+const { IGNORE_TAGS } = require('../constants');
 
 const Logger = core.utils.Logger;
 
