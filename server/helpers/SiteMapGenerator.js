@@ -9,6 +9,7 @@ const { sleep } = require('../helpers/time');
 const Post = require('../models/Post');
 const DayInfo = require('../models/DayInfo');
 const basicLinks = require('../../data/basicLinks.json');
+const IGNORE_TAGS = require('../constants');
 
 const Logger = core.utils.Logger;
 
@@ -136,7 +137,7 @@ class SiteMapGenerator {
 
         const tags = await this._getTrendingTags();
 
-        for (const { name } of tags) {
+        for (const name of tags) {
             links.push(
                 {
                     loc: `${HOSTNAME}/trending/${name}`,
@@ -217,7 +218,12 @@ class SiteMapGenerator {
     async _getTrendingTags() {
         if (!this._tags || Date.now() > this._tagsTs + REFRESH_TAGS_INTERVAL) {
             try {
-                this._tags = await golos.api.getTrendingTags(null, 100);
+                const tags = await golos.api.getTrendingTags(null, 100);
+
+                this._tags = tags
+                    .map(tagInfo => tagInfo.name)
+                    .filter(tag => !IGNORE_TAGS.has(tag));
+
                 this._tagsTs = Date.now();
             } catch (err) {
                 Logger.error('Get tags error:', err);
