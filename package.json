@@ -7,7 +7,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/index.js",
-    "download": "node scripts/download_initial_site_map.js"
+    "download": "node scripts/download_initial_site_map.js",
+    "analyze": "node scripts/analyze_posts.js"
   },
   "license": "ISC",
   "dependencies": {
