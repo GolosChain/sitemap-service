@@ -17,14 +17,14 @@ services:
       - services-tier
 
   sitemap-node:
+    image: cyberway/sitemap-service:0.1.0
     container_name: sitemap-node
     restart: always
     depends_on:
       sitemap-mongo:
         condition: service_healthy
-    build:
-      context: .
-      dockerfile: Dockerfile
+    volumes:
+      - /var/sitemap:/sitemap
     networks:
       - services-tier
     env_file:
