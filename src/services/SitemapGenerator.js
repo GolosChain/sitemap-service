@@ -69,11 +69,11 @@ class SitemapGenerator extends BasicService {
             }
         );
 
-        for (const { date } of dates) {
+        for (const date of dates) {
             try {
                 await this._generateForDate(date);
             } catch (err) {
-                Logger.error(`Can't create sitemap for date: (${date})`);
+                Logger.error(`Can't create sitemap for date: (${date}):`, err);
             }
         }
 
@@ -118,7 +118,7 @@ class SitemapGenerator extends BasicService {
         await this._writeXml(`sitemap_${date}.xml`, doc);
     }
 
-    _postToXml({ userId, permlink, updateAt, account }) {
+    _postToXml({ userId, permlink, updatedAt, account }) {
         const username = account.length ? account[0].username : userId;
 
         return {
@@ -126,7 +126,7 @@ class SitemapGenerator extends BasicService {
                 '#text': `${HOSTNAME}/@${username}/${permlink}`,
             },
             lastmod: {
-                '#text': formatDate(updateAt),
+                '#text': formatDate(updatedAt),
             },
             changefreq: {
                 '#text': 'daily',

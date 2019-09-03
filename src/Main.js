@@ -3,6 +3,7 @@ const BasicMain = core.services.BasicMain;
 const { Logger, GenesisProcessor } = core.utils;
 const env = require('./data/env');
 const Subscriber = require('./services/Subscriber');
+const SitemapGenerator = require('./services/SitemapGenerator');
 const ServiceMetaModel = require('./models/ServiceMeta');
 const GenesisController = require('./controllers/Genesis');
 
@@ -13,14 +14,11 @@ class Main extends BasicMain {
         this.startMongoBeforeBoot();
 
         this._subscriber = new Subscriber();
+        this._generator = new SitemapGenerator();
     }
 
     async boot() {
-        const meta = await ServiceMetaModel.findOne(
-            {},
-            { _id: 1 },
-            { lean: true }
-        );
+        const meta = await ServiceMetaModel.findOne({}, { _id: 1 }, { lean: true });
 
         if (!meta) {
             const model = new ServiceMetaModel({});
@@ -38,8 +36,10 @@ class Main extends BasicMain {
             return;
         }
 
-        this.addNested(this._subscriber);
+        this.addNested(this._subscriber, this._generator);
+
         await this._subscriber.start();
+        await this._generator.start();
     }
 
     async _getMeta() {
