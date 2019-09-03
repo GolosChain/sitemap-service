@@ -115,7 +115,7 @@ class SitemapGenerator extends BasicService {
             { encoding: 'utf-8' }
         );
 
-        await this._writeXml(`sitemap/sitemap_${date}.xml`, doc);
+        await this._writeXml(`sitemap_${date}.xml`, doc);
     }
 
     _postToXml({ userId, permlink, updateAt, account }) {
@@ -176,7 +176,7 @@ class SitemapGenerator extends BasicService {
                         { encoding: 'utf-8' }
                     );
 
-                    await this._writeXml('sitemap/sitemap.xml', doc);
+                    await this._writeXml('sitemap.xml', doc);
 
                     resolve();
                 } catch (err) {
@@ -209,7 +209,7 @@ class SitemapGenerator extends BasicService {
             { encoding: 'utf-8' }
         );
 
-        await this._writeXml('sitemap/sitemap_common.xml', doc);
+        await this._writeXml('sitemap_common.xml', doc);
     }
 
     async _writeXml(fileName, doc) {

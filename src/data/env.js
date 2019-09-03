@@ -7,5 +7,5 @@ module.exports = {
     GLS_SKIP_GENESIS: Boolean(env.GLS_SKIP_GENESIS) && env.GLS_SKIP_GENESIS !== 'false',
     GLS_GENERATE_EVERY: Number(env.GLS_GENERATE_EVERY) || 30000,
     GLS_PAUSE: Boolean(env.GLS_PAUSE) && env.GLS_PAUSE !== 'false',
-    GLS_DESTINATION_FOLDER: env.GLS_DESTINATION_FOLDER || './',
+    GLS_DESTINATION_FOLDER: env.GLS_DESTINATION_FOLDER || './sitemap',
 };
