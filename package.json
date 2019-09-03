@@ -14,7 +14,10 @@
   "author": "golos.io",
   "license": "GPL-3.0",
   "dependencies": {
-    "gls-core-service": "^3.52.0"
+    "fs-extra": "^8.1.0",
+    "gls-core-service": "^3.52.0",
+    "moment": "^2.24.0",
+    "xmlbuilder": "^13.0.2"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

@@ -1,0 +1,18 @@
+[
+  {
+    "url": "/created",
+    "changeFreq": "always"
+  },
+  {
+    "url": "/hot",
+    "changeFreq": "daily"
+  },
+  {
+    "url": "/trending",
+    "changeFreq": "daily"
+  },
+  {
+    "url": "/leaders",
+    "changeFreq": "daily"
+  }
+]
