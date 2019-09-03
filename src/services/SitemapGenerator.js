@@ -1,3 +1,4 @@
+const path = require('path');
 const xmlbuilder = require('xmlbuilder');
 const fs = require('fs-extra');
 
@@ -212,7 +213,10 @@ class SitemapGenerator extends BasicService {
     }
 
     async _writeXml(fileName, doc) {
-        await fs.writeFile(fileName, doc.end({ pretty: true }));
+        await fs.writeFile(
+            path.join(env.GLS_DESTINATION_FOLDER, fileName),
+            doc.end({ pretty: true })
+        );
     }
 }
 

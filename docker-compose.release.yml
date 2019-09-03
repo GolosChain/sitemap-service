@@ -23,6 +23,8 @@ services:
     depends_on:
       sitemap-mongo:
         condition: service_healthy
+    volumes:
+      - /var/sitemap:/sitemap
     networks:
       - services-tier
     env_file:
