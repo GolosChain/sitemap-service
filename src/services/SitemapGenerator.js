@@ -1,10 +1,11 @@
 const path = require('path');
 const xmlbuilder = require('xmlbuilder');
 const fs = require('fs-extra');
+const moment = require('moment');
 
 const core = require('gls-core-service');
 const BasicService = core.services.Basic;
-const { Logger, GenesisProcessor } = core.utils;
+const { Logger } = core.utils;
 
 const env = require('../data/env');
 const commonList = require('../data/commonList');
@@ -129,7 +130,7 @@ class SitemapGenerator extends BasicService {
                 '#text': formatDate(updatedAt),
             },
             changefreq: {
-                '#text': 'daily',
+                '#text': getChangeFreq(updatedAt),
             },
         };
     }
@@ -222,6 +223,23 @@ class SitemapGenerator extends BasicService {
 
 function formatDate(date) {
     return date.toJSON().substr(0, 19) + '+00:00';
+}
+
+function getChangeFreq(date) {
+    const weekAgo = moment().subtract(7, 'day');
+    const ts = moment(date);
+
+    if (ts.isAfter(weekAgo, 'day')) {
+        return 'daily';
+    }
+
+    const monthAgo = moment().subtract(30, 'day');
+
+    if (ts.isAfter(monthAgo, 'day')) {
+        return 'weekly';
+    }
+
+    return 'monthly';
 }
 
 module.exports = SitemapGenerator;
