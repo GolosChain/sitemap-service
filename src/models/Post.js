@@ -16,7 +16,7 @@ module.exports = MongoDB.makeModel(
             type: String,
             required: true,
         },
-        updatedAt: {
+        lastUpdateAt: {
             type: Date,
             required: true,
         },

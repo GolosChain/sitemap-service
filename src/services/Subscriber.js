@@ -150,7 +150,7 @@ class Subscriber extends BasicService {
                 userId: contentId.userId,
                 permlink: contentId.permlink,
                 postingDate,
-                updatedAt: blockTime,
+                lastUpdateAt: blockTime,
             });
         } catch (err) {
             if (err.code === 11000) {
@@ -173,7 +173,7 @@ class Subscriber extends BasicService {
 
         if (post) {
             await PostModel.updateOne(contentId, {
-                updatedAt: blockTime,
+                lastUpdateAt: blockTime,
             });
 
             return post.postingDate;

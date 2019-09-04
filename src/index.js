@@ -1,2 +1,1 @@
-const gls = require('gls-core-service');
-gls.utils.defaultStarter(require('./Main'));
+require('gls-core-service').utils.defaultStarter(require('./Main'));

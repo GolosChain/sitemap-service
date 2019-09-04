@@ -101,7 +101,7 @@ class GenesisContent {
             userId,
             permlink,
             postingDate,
-            updatedAt: createdTime,
+            lastUpdateAt: createdTime,
         });
 
         const lastUpdateAt = this._genesisDates.get(postingDate);
