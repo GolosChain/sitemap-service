@@ -112,7 +112,7 @@ class Subscriber extends BasicService {
         });
     }
 
-    async _handleMessageCreate(data, { blockTime }) {
+    async _handleMessageCreate(data, { blockNum, blockTime }) {
         // Пропускаем комментарии
         if (data.parent_id && data.parent_id.author) {
             return;
@@ -122,12 +122,23 @@ class Subscriber extends BasicService {
 
         const postingDate = moment(blockTime).format('YYYY-MM-DD');
 
-        await PostModel.create({
-            userId: contentId.userId,
-            permlink: contentId.permlink,
-            postingDate,
-            updatedAt: blockTime,
-        });
+        try {
+            await PostModel.create({
+                userId: contentId.userId,
+                permlink: contentId.permlink,
+                postingDate,
+                updatedAt: blockTime,
+            });
+        } catch (err) {
+            if (err.code === 11000) {
+                Logger.warn(
+                    `Duplicate post. Block num: (${blockNum}), author: "${contentId.userId}", permlink: "${contentId.permlink}"`
+                );
+                return;
+            } else {
+                throw err;
+            }
+        }
 
         return postingDate;
     }
