@@ -24,6 +24,7 @@ class SitemapGenerator extends BasicService {
     }
 
     async startProcessing() {
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             try {
                 await this._generateBulk();
@@ -36,6 +37,7 @@ class SitemapGenerator extends BasicService {
     }
 
     async _generateBulk() {
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             const datesUpdated = await this._generate();
 

@@ -1,6 +1,6 @@
 const core = require('gls-core-service');
 const BasicService = core.services.Basic;
-const { Logger, metrics } = core.utils;
+const { Logger } = core.utils;
 const { BlockSubscribe } = core.services;
 const moment = require('moment');
 
