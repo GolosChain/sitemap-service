@@ -51,6 +51,8 @@ class SitemapGenerator extends BasicService {
     }
 
     async _generate() {
+        const generateStartTime = new Date();
+
         const datesObjects = await DateModel.find(
             { needRegenerate: true },
             { _id: false, date: true },
@@ -59,19 +61,6 @@ class SitemapGenerator extends BasicService {
 
         const dates = datesObjects.map(({ date }) => date);
 
-        await DateModel.updateMany(
-            {
-                date: {
-                    $in: dates,
-                },
-            },
-            {
-                $set: {
-                    needRegenerate: false,
-                },
-            }
-        );
-
         for (const date of dates) {
             try {
                 await this._generateForDate(date);
@@ -79,6 +68,29 @@ class SitemapGenerator extends BasicService {
                 Logger.error(`Can't create sitemap for date: (${date}):`, err);
             }
         }
+
+        await DateModel.updateMany(
+            {
+                $and: [
+                    {
+                        date: {
+                            $in: dates,
+                        },
+                    },
+                    {
+                        needRegenerateAt: {
+                            $lte: generateStartTime,
+                        },
+                    },
+                ],
+            },
+            {
+                $set: {
+                    needRegenerate: false,
+                    needRegenerateAt: null,
+                },
+            }
+        );
 
         return datesObjects.length;
     }
@@ -101,7 +113,6 @@ class SitemapGenerator extends BasicService {
                     userId: true,
                     permlink: true,
                     lastUpdateAt: true,
-                    updatedAt: true,
                     account: true,
                 },
             },
@@ -122,19 +133,18 @@ class SitemapGenerator extends BasicService {
         await this._writeXml(`sitemap_${date}.xml`, doc);
     }
 
-    _postToXml({ userId, permlink, lastUpdateAt, updatedAt, account }) {
+    _postToXml({ userId, permlink, lastUpdateAt, account }) {
         const username = account.length ? account[0].username : userId;
-        const updateDate = lastUpdateAt || updatedAt;
 
         return {
             loc: {
                 '#text': `${HOSTNAME}/@${username}/${permlink}`,
             },
             lastmod: {
-                '#text': formatDate(updateDate),
+                '#text': formatDate(lastUpdateAt),
             },
             changefreq: {
-                '#text': getChangeFreq(updateDate),
+                '#text': getChangeFreq(lastUpdateAt),
             },
         };
     }

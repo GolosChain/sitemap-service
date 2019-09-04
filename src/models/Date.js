@@ -16,6 +16,10 @@ module.exports = MongoDB.makeModel(
             type: Boolean,
             required: true,
         },
+        needRegenerateAt: {
+            type: Date,
+            default: null,
+        },
     },
     {
         index: [

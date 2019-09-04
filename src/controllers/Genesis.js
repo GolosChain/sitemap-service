@@ -115,11 +115,13 @@ class GenesisContent {
 
     async _onDone() {
         Logger.info('Dates saving started');
+        const now = new Date();
 
         for (const [date, lastUpdateAt] of this._genesisDates) {
             this._datesBulk.addEntry({
                 date,
                 needRegenerate: true,
+                needRegenerateAt: now,
                 lastUpdateAt,
             });
         }

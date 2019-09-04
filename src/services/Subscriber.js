@@ -103,6 +103,7 @@ class Subscriber extends BasicService {
                     date: result,
                     lastUpdateAt: block.blockTime,
                     needRegenerate: true,
+                    needRegenerateAt: new Date(),
                 },
                 {
                     upsert: true,
