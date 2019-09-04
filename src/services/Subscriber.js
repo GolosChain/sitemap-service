@@ -80,7 +80,7 @@ class Subscriber extends BasicService {
                     break;
             }
         } catch (err) {
-            Logger.error(
+            Logger.warn(
                 `Error while processing "${pathName}", block num (${block.blockNum}):`,
                 err
             );
