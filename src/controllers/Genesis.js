@@ -117,7 +117,7 @@ class GenesisContent {
         Logger.info('Dates saving started');
 
         for (const [date, lastUpdateAt] of this._genesisDates) {
-            this._datesBulk.add({
+            this._datesBulk.addEntry({
                 date,
                 needRegenerate: true,
                 lastUpdateAt,
