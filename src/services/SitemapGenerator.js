@@ -214,10 +214,11 @@ class SitemapGenerator extends BasicService {
     }
 
     async _writeXml(fileName, doc) {
-        await fs.writeFile(
-            path.join(env.GLS_DESTINATION_FOLDER, fileName),
-            doc.end({ pretty: true })
-        );
+        const fullFileName = path.join(env.GLS_DESTINATION_FOLDER, fileName);
+        const swapFullFileName = `${fullFileName}.swap`;
+
+        await fs.writeFile(swapFullFileName, doc.end({ pretty: true }));
+        await fs.rename(swapFullFileName, fullFileName);
     }
 }
 
