@@ -2,6 +2,7 @@ const path = require('path');
 const xmlbuilder = require('xmlbuilder');
 const fs = require('fs-extra');
 const moment = require('moment');
+const wait = require('then-sleep');
 
 const core = require('gls-core-service');
 const BasicService = core.services.Basic;
@@ -11,7 +12,6 @@ const env = require('../data/env');
 const commonList = require('../data/commonList');
 const PostModel = require('../models/Post');
 const DateModel = require('../models/Date');
-const { wait } = require('../utils/time');
 
 const HOSTNAME = 'https://golos.io';
 const CHUNK_SIZE = 1000;

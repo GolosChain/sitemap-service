@@ -17,6 +17,7 @@
     "fs-extra": "^8.1.0",
     "gls-core-service": "^3.52.0",
     "moment": "^2.24.0",
+    "then-sleep": "^1.0.1",
     "xmlbuilder": "^13.0.2"
   },
   "devDependencies": {
