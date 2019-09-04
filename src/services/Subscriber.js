@@ -64,7 +64,7 @@ class Subscriber extends BasicService {
         try {
             switch (pathName) {
                 case 'cyber.domain->newusername':
-                    await this._handleNewUsername(action.args);
+                    await this._handleNewUsername(action.args, block);
                     break;
 
                 case 'gls.publish->createmssg':
@@ -101,15 +101,28 @@ class Subscriber extends BasicService {
         }
     }
 
-    async _handleNewUsername({ owner: userId, name: username, creator: communityId }) {
+    async _handleNewUsername(
+        { owner: userId, name: username, creator: communityId },
+        { blockNum }
+    ) {
         if (communityId !== 'gls') {
             return;
         }
 
-        await AccountModel.create({
-            userId,
-            username,
-        });
+        try {
+            await AccountModel.create({
+                userId,
+                username,
+            });
+        } catch (err) {
+            if (err.code === 11000) {
+                Logger.warn(
+                    `Duplicate user. Block num: (${blockNum}), userId: "${userId}", username: "${username}"`
+                );
+            } else {
+                throw err;
+            }
+        }
     }
 
     async _handleMessageCreate(data, { blockNum, blockTime }) {
