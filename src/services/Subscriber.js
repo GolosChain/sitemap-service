@@ -59,8 +59,8 @@ class Subscriber extends BasicService {
             {},
             {
                 $set: {
+                    lastProcessedBlockNum: block.blockNum,
                     lastProcessedSequence: block.sequence,
-                    lastProcessedTime: block.blockTime,
                 },
             }
         );
