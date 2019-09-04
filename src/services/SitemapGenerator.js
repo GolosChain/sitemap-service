@@ -101,6 +101,7 @@ class SitemapGenerator extends BasicService {
                     userId: true,
                     permlink: true,
                     lastUpdateAt: true,
+                    updatedAt: true,
                     account: true,
                 },
             },
@@ -121,18 +122,19 @@ class SitemapGenerator extends BasicService {
         await this._writeXml(`sitemap_${date}.xml`, doc);
     }
 
-    _postToXml({ userId, permlink, lastUpdateAt, account }) {
+    _postToXml({ userId, permlink, lastUpdateAt, updatedAt, account }) {
         const username = account.length ? account[0].username : userId;
+        const updateDate = lastUpdateAt || updatedAt;
 
         return {
             loc: {
                 '#text': `${HOSTNAME}/@${username}/${permlink}`,
             },
             lastmod: {
-                '#text': formatDate(lastUpdateAt),
+                '#text': formatDate(updateDate),
             },
             changefreq: {
-                '#text': getChangeFreq(lastUpdateAt),
+                '#text': getChangeFreq(updateDate),
             },
         };
     }
