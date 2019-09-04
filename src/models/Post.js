@@ -34,7 +34,7 @@ module.exports = MongoDB.makeModel(
             },
             {
                 fields: {
-                    postedDate: 1,
+                    postingDate: 1,
                 },
             },
         ],
