@@ -54,6 +54,16 @@ class Subscriber extends BasicService {
                 await this._processAction(action, block);
             }
         }
+
+        await ServiceMetaModel.updateOne(
+            {},
+            {
+                $set: {
+                    lastProcessedSequence: block.sequence,
+                    lastProcessedTime: block.blockTime,
+                },
+            }
+        );
     }
 
     async _processAction(action, block) {
