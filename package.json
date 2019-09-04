@@ -1,6 +1,6 @@
 {
   "name": "sitemap",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Golos.io Sitemap Generator",
   "main": "src/index.js",
   "scripts": {
