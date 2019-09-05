@@ -14,5 +14,9 @@
   {
     "url": "/leaders",
     "changeFreq": "daily"
+  },
+  {
+    "url": "/validators",
+    "changeFreq": "daily"
   }
 ]
