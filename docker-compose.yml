@@ -1,0 +1,52 @@
+version: '2.1'
+services:
+  sitemap-mongo:
+    container_name: sitemap-mongo
+    image: mongo
+    restart: always
+    healthcheck:
+      test: mongo --eval 'db.getCollectionNames()'
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    volumes:
+      - sitemap-mongodb-vol:/data/db
+    ports:
+      - 127.0.0.1:27017:27017
+    networks:
+      - services-tier
+
+  mongodb-exporter:
+    container_name: mongodb-exporter
+    image: cyberway/mongodb-exporter:v0.6.2
+    restart: always
+    depends_on:
+      sitemap-mongo:
+        condition: service_healthy
+    ports:
+      - 9216:9216
+    environment:
+      - MONGODB_URI=mongodb://sitemap-mongo:27017
+      - HTTP_AUTH=${MONGODB_EXPORTER_USER:?Can't start without auth variable MONGODB_EXPORTER_USER}:${MONGODB_EXPORTER_PASS:?Can't start without auth variable MONGODB_EXPORTER_PASS}
+    networks:
+      - services-tier
+
+  sitemap-node:
+    image: cyberway/sitemap-service:latest
+    container_name: sitemap-node
+    restart: always
+    depends_on:
+      sitemap-mongo:
+        condition: service_healthy
+    volumes:
+      - /var/sitemap:/sitemap
+    networks:
+      - services-tier
+    env_file:
+      - .env
+
+volumes:
+  sitemap-mongodb-vol:
+
+networks:
+  services-tier:
